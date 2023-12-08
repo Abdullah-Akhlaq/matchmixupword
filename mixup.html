@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Mixup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #414BB2 !important;
+        }
+
+        .wrapper {
+            display: flex;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            gap: 20px;
+
+        }
+
+        #login-btn,
+        #signup-btn,
+        #help-btn {
+            background-color: #DA0063;
+            border-radius: 5px;
+            border: none;
+            font-size: 18px;
+            padding: 15px 50px;
+            color: white;
+
+        }
+
+        #center-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .button-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10
+        }
+
+        .button {
+            margin: 10px 10px;
+            padding: 10px 20px;
+
+            background-color: #DA0063;
+            border-radius: 5px;
+            border: none;
+            font-size: 18px;
+            padding: 15px 50px;
+            color: white;
+        }
+
+        .word-help {
+            background-color: #BB0F73;
+            padding: 60px;
+            font-size: 80px;
+            font-weight: 900;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <button id="login-btn"><a href="login.html">LOG IN/ SIGN-UP </a></button>
+        <button id="signup-btn"> <a href="index.html">HIGH SCORES</a></button>
+        <button id="help-btn"> <a href="index.html">HELP</a></button>
+    </div>
+
+
+    <div id="center-container">
+        <h1 class="word-help">Word <br> Mix-Up</h1>
+
+        <div class="button-row">
+            <button class="button"><a href="index.html">Play</a> </button>
+            <button class="button"> <a href="index.html">How to Play</a> </button>
+            <button class="button"><a href="index.html">Settings</a></button>
+        </div>
+    </div>
+
+</body>
+
+</html>

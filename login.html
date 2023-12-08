@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <title>Firebase Authentication</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="login-box">
+
+        <div class="right">
+            <h1 id='status'>Login</h1>
+            <input type="text" id="login-email" name="email" placeholder="E-mail" />
+            <input type="password" id="login-password1" name="password" placeholder="Password" />
+
+            <input type="submit" id='login' name="login" value="Login" />
+
+            <input type="submit" id='logout' name="logout" value="Logout" />
+
+        </div>
+
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, set, ref, update, get } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+        // Import Firestore from the latest version
+        import { getFirestore, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyzZ8UZkzbBNdVBQZ4L7NOJxwRuOrtLSY",
+            authDomain: "wordcheck-d715f.firebaseapp.com",
+            projectId: "wordcheck-d715f",
+            storageBucket: "wordcheck-d715f.appspot.com",
+            messagingSenderId: "74614979893",
+            appId: "1:74614979893:web:9afed2b2318e4ad665607c",
+            measurementId: "G-1ZK7N48W1S"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        login.addEventListener('click', async (e) => {
+            var email = document.getElementById('login-email').value;
+            var password1 = document.getElementById('login-password1').value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password1);
+                const user = userCredential.user;
+
+                const dt = new Date();
+                console.log(user);
+
+                // Set displayName if available
+                if (user.displayName) {
+                    document.getElementById('status').innerText = `Logged in as ${user.displayName}`;
+                }
+
+                update(ref(database, 'users/' + user.uid), {
+                    last_login: dt,
+                });
+
+                // Retrieve user data from the Realtime Database
+                const userRef = ref(database, 'users/' + user.uid);
+                const userSnapshot = await get(userRef);
+
+                // Store user data in local storage
+                const userData = userSnapshot.val();
+                localStorage.setItem("user", JSON.stringify(userData));
+
+                // Redirect to index.html or do any other actions
+                window.location.href = "index.html";
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+    </script>
+</body>
+
+</html>

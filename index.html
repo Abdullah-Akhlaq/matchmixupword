@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #414BB2;
+        }
+
+        #game-container {
+            display: none;
+        }
+
+        .timer-clock {
+            position: relative;
+            width: 74px;
+            margin: 0 auto;
+        }
+
+        .timer1 {
+            position: absolute !important;
+            top: -5px;
+            left: 20px;
+            font-size: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: #414BB2;
+        }
+
+        .letter-boxes {
+            display: flex;
+            justify-content: center;
+        }
+
+        .letter-box {
+            display: inline-block;
+            background-color: #BB0F73;
+            width: 30px;
+            /* Adjust the width as needed */
+            height: 30px;
+            /* Add border for better visibility */
+            margin: 5px;
+            /* Adjust margin as needed */
+            text-align: center;
+            line-height: 30px;
+            /* Center the text vertically */
+            font-size: 16px;
+            /* Adjust font size as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-container">
+
+        <button onclick="startGame()">Play as Guest</button>
+        <button> <a href="./login.html">Login/Sign Up</a></button>
+    </div>
+
+    <div id="game-container">
+
+        <p>Score: <span id="current-score">0</span></p>
+        <p>Best Score: <span id="best-score">0</span></p>
+        <div class="timer-clock">
+            <img src="./images/timer.png" alt="" width="70px">
+            <div class="timer1">
+
+                <p id="timer">30</p>
+            </div>
+        </div>
+        <p>Hint: <span id="hint"></span></p>
+        <input type="text" id="guess-input" placeholder="Type your guess...">
+        <button onclick="checkGuess()">Submit Guess</button>
+        <button onclick="refreshWord()">Refresh Word</button>
+
+        <div id="word-display"></div>
+
+        <div id="display-correct-word" style="display: none;"></div>
+
+    </div>
+
+
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, set, push, ref } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyzZ8UZkzbBNdVBQZ4L7NOJxwRuOrtLSY",
+            authDomain: "wordcheck-d715f.firebaseapp.com",
+            projectId: "wordcheck-d715f",
+            storageBucket: "wordcheck-d715f.appspot.com",
+            messagingSenderId: "74614979893",
+            appId: "1:74614979893:web:9afed2b2318e4ad665607c",
+            measurementId: "G-1ZK7N48W1S"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to post dummy data to the WordRecord database
+        window.postDummyData = function (score) {
+            const user = localStorage.getItem('user');
+            const userObj = user ? JSON.parse(user) : null;
+
+            // Check if userObj has displayName
+            const displayName = userObj && userObj.displayName ? userObj.displayName : "Guest";
+
+            const userRef = push(ref(database, 'playerScore'));
+            set(userRef, {
+                score: score,
+                displayName: displayName,
+            });
+        };
+        // Example usage
+
+
+    </script>
+
+    <script defer>
+
+        const words = [
+            { word: "happy", hint: "Brings joy and smiles" },
+            { word: "ocean", hint: "Vast body of saltwater" },
+            { word: "apple", hint: "A common fruit" },
+            { word: "globe", hint: "World map" },
+            { word: "dream", hint: "Imaginary experiences during sleep" },
+            { word: "cloud", hint: "White fluffy mass in the sky" },
+            { word: "dance", hint: "Expressing oneself through movement" },
+            { word: "music", hint: "Art form and cultural activity" },
+            { word: "light", hint: "Visible radiant energy" },
+            { word: "green", hint: "Color of grass and leaves" },
+            { word: "beach", hint: "Sandy shore by the sea" },
+            { word: "smile", hint: "Expressing happiness with the face" },
+            { word: "peace", hint: "Absence of war and conflict" },
+            { word: "sunny", hint: "Bright and full of sunlight" },
+            { word: "sweet", hint: "Having a pleasant taste" },
+            { word: "laugh", hint: "Sound of joy and amusement" },
+            { word: "birds", hint: "Feathered flying creatures" },
+            { word: "grace", hint: "Elegance and beauty of movement" },
+            { word: "faith", hint: "Strong belief or trust" },
+            { word: "books", hint: "Source of knowledge and stories" },
+            { word: "stars", hint: "Glowing celestial bodies in the sky" },
+            { word: "focus", hint: "Concentration and attention" },
+            { word: "heart", hint: "Organ that pumps blood" },
+            { word: "kinds", hint: "Different types or sorts" },
+            { word: "fresh", hint: "Recently made or obtained" },
+            { word: "grain", hint: "Small, hard seed" },
+            { word: "plant", hint: "Living organism with roots and leaves" },
+            { word: "smell", hint: "Perception through the nose" },
+            { word: "taste", hint: "Sensation of flavor" },
+            { word: "water", hint: "Clear liquid essential for life" }
+        ];
+        let currentScore = 0;
+        let bestScore = 0;
+        let timer;
+
+        function startGame() {
+            hideLoginContainer();
+            showGameContainer();
+            displayNewWord();
+            startTimer();
+        }
+
+        function showLogin() {
+            // Add your login/sign-up logic here
+            alert("Login/Sign Up functionality to be implemented.");
+        }
+
+        function hideLoginContainer() {
+            document.getElementById("login-container").style.display = "none";
+        }
+
+        function showGameContainer() {
+            document.getElementById("game-container").style.display = "block";
+        }
+
+        // function displayNewWord() {
+        //     const randomIndex = Math.floor(Math.random() * words.length);
+        //     const wordToGuess = words[randomIndex];
+        //     document.getElementById("display-correct-word").textContent = wordToGuess.word;
+
+        //     document.getElementById("word-display").textContent = scrambleWord(wordToGuess.word);
+        //     document.getElementById("hint").textContent = "Hint: " + wordToGuess.hint;
+        // }
+
+        // function scrambleWord(word) {
+        //     return word.split('').sort(() => Math.random() - 1).join('');
+        // }
+
+
+        function displayNewWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const wordToGuess = words[randomIndex];
+
+            document.getElementById("display-correct-word").textContent = wordToGuess.word;
+
+            const wordDisplayContainer = document.getElementById("word-display");
+            wordDisplayContainer.innerHTML = ''; // Clear previous content
+
+            // Create individual letter boxes
+            const scrambledWord = scrambleWord(wordToGuess.word);
+            for (const letter of scrambledWord) {
+                const letterBox = document.createElement('div');
+                letterBox.classList.add('letter-box');
+                letterBox.textContent = letter;
+                wordDisplayContainer.appendChild(letterBox);
+            }
+
+            document.getElementById("hint").textContent = "Hint: " + wordToGuess.hint;
+        }
+
+        function scrambleWord(word) {
+            // Return an array of scrambled letters
+            return word.split('').sort(() => Math.random() - 0.5);
+        }
+
+
+        function startTimer() {
+            let seconds = 30;
+            timer = setInterval(function () {
+                document.getElementById("timer").textContent = seconds;
+                seconds--;
+                if (seconds === 1) {
+                    postDummyData(currentScore);
+                }
+
+                if (seconds < 0) {
+                    clearInterval(timer);
+                    displayCorrectWord();
+                }
+            }, 1000);
+        }
+
+        function checkGuess() {
+            const userGuess = document.getElementById("guess-input").value.toLowerCase();
+            const correctWord = document.getElementById("display-correct-word").textContent;
+            if (userGuess === correctWord) {
+                currentScore += 10;
+                document.getElementById("current-score").textContent = currentScore;
+                displayNewWord();
+            }
+        }
+
+        function refreshWord() {
+            displayNewWord();
+        }
+
+        function displayCorrectWord() {
+            clearInterval(timer);
+            alert("Time's up! The correct word was: " + document.getElementById("word-display").textContent);
+            if (currentScore > bestScore) {
+                bestScore = currentScore;
+                document.getElementById("best-score").textContent = bestScore;
+            }
+            resetGame();
+        }
+
+        function resetGame() {
+            currentScore = 0;
+            document.getElementById("current-score").textContent = currentScore;
+            startGame();
+        }
+
+        function postDummyData(score) {
+            const user = localStorage.getItem('user');
+            const userObj = user ? JSON.parse(user) : null;
+
+            const displayName = userObj && userObj.displayName ? userObj.displayName : "Guest";
+
+            const userRef = push(ref(database, 'playerScore'));
+            set(userRef, {
+                score: score,
+                displayName: displayName,
+            });
+        }
+
+    </script>
+</body>
+
+</html>

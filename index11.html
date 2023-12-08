@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #game-container {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-container">
+        <h2>Welcome to the Word Guessing Game!</h2>
+        <button onclick="startGame()">Play as Guest</button>
+        <button><a href="./login.html">Login/Sign Up</a></button>
+    </div>
+
+    <div id="game-container">
+        <h2>Word Guessing Game</h2>
+        <p>Score: <span id="current-score">0</span></p>
+        <p>Best Score: <span id="best-score">0</span></p>
+        <p>Timer: <span id="timer">30</span> seconds</p>
+        <p>Hint: <span id="hint"></span></p>
+        <input type="text" id="guess-input" placeholder="Type your guess...">
+        <button onclick="checkGuess()">Submit Guess</button>
+        <button onclick="refreshWord()">Refresh Word</button>
+        <div id="word-display"></div>
+
+        <div id="display-correct-word" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Sample word list
+        const words = [
+            "sunshine", "elephant", "butterfly", "chocolate", "adventure",
+            // Add more words as needed
+        ];
+
+        let currentScore = 0;
+        let bestScore = 0;
+        let timer;
+        let userName = "Guest"; // Default name for guest users
+
+        function startGame() {
+            hideLoginContainer();
+            showGameContainer();
+            displayNewWord();
+            startTimer();
+        }
+
+        function showLogin() {
+            // Add your login/sign-up logic here
+            alert("Login/Sign Up functionality to be implemented.");
+        }
+
+        function hideLoginContainer() {
+            document.getElementById("login-container").style.display = "none";
+        }
+
+        function showGameContainer() {
+            document.getElementById("game-container").style.display = "block";
+        }
+
+        function displayNewWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const wordToGuess = words[randomIndex];
+
+            document.getElementById("display-correct-word").textContent = wordToGuess;
+            document.getElementById("word-display").textContent = scrambleWord(wordToGuess);
+            document.getElementById("hint").textContent = "Hint: " + generateHint(wordToGuess);
+        }
+
+        function scrambleWord(word) {
+            return word.split('').sort(() => Math.random() - 0.5).join('');
+        }
+
+        function generateHint(word) {
+            // For simplicity, just return the first letter of the word
+            return word.charAt(0);
+        }
+
+        function startTimer() {
+            let seconds = 30;
+            timer = setInterval(function () {
+                document.getElementById("timer").textContent = seconds;
+                seconds--;
+
+                if (seconds < 0) {
+                    clearInterval(timer);
+                    displayCorrectWord();
+                }
+            }, 1000);
+        }
+
+        function checkGuess() {
+            const userGuess = document.getElementById("guess-input").value.toLowerCase();
+            const correctWord = document.getElementById("display-correct-word").textContent;
+            if (userGuess === correctWord) {
+                currentScore += 10;
+                document.getElementById("current-score").textContent = currentScore;
+                displayNewWord();
+            }
+        }
+
+        function refreshWord() {
+            displayNewWord();
+        }
+
+        function displayCorrectWord() {
+            clearInterval(timer);
+            alert("Time's up! The correct word was: " + document.getElementById("word-display").textContent);
+            if (currentScore > bestScore) {
+                bestScore = currentScore;
+                document.getElementById("best-score").textContent = bestScore;
+            }
+            updateHighScore();
+            resetGame();
+        }
+
+        function updateHighScore() {
+            // Initialize Firestore
+            const db = firebase.firestore();
+
+            // Add the score to the "wordScore" collection
+            db.collection("wordScore").add({
+                userName: userName,
+                score: currentScore,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+                .then((docRef) => {
+                    console.log("High score added with ID: ", docRef.id);
+                })
+                .catch((error) => {
+                    console.error("Error adding high score: ", error);
+                });
+        }
+
+        function resetGame() {
+            currentScore = 0;
+            document.getElementById("current-score").textContent = currentScore;
+            startGame();
+        }
+    </script>
+
+    <!-- Include the latest version of Firebase App SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <!-- Include the latest version of Firebase Firestore SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+
+    <script type="module">
+
+        // Your web app's Firebase configuration
+        // Replace with your own Firebase config
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+    </script>
+</body>
+
+</html>
