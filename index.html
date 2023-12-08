@@ -6,15 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Guessing Game</title>
     <style>
+        /* *{
+            box-sizing: border-box;
+            margin: 0;
+        } */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
             background-color: #414BB2;
+            padding: 20px;
         }
 
         #game-container {
             display: none;
+            height: 90vh;
+        }
+
+        #guess-input {
+            padding: 20px;
+            border: 3px solid #D1D1D1;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
         .timer-clock {
@@ -42,17 +55,74 @@
         .letter-box {
             display: inline-block;
             background-color: #BB0F73;
-            width: 30px;
-            /* Adjust the width as needed */
-            height: 30px;
+            padding: 30px;
             /* Add border for better visibility */
             margin: 5px;
+
             /* Adjust margin as needed */
             text-align: center;
             line-height: 30px;
             /* Center the text vertically */
-            font-size: 16px;
+            font-size: 40px;
+            color: white;
+            font-weight: 800;
+            text-transform: capitalize;
             /* Adjust font size as needed */
+        }
+
+        .button {
+            margin: 10px 10px;
+            padding: 10px 20px;
+
+            background-color: #DA0063;
+            border-radius: 5px;
+            border: none;
+            font-size: 18px;
+            padding: 15px 50px;
+            color: white;
+        }
+
+        #hint {
+            font-size: 30px;
+            color: white;
+        }
+
+        #c-score {
+            font-size: large;
+            color: white;
+            width: fit-content;
+
+        }
+
+        #current-score {
+            margin-top: 10px;
+            background-color: #00A6ED;
+            color: white;
+            font-size: 20px;
+            padding: 3px 8px;
+            width: fit-content;
+            margin-right: 40px;
+            border-radius: 3px;
+        }
+
+        .currentScorea {
+
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .quit-footer {
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            width: 100%;
+            left: 0;
+            padding: 20px 0px;
+           
+
         }
     </style>
 </head>
@@ -66,8 +136,16 @@
 
     <div id="game-container">
 
-        <p>Score: <span id="current-score">0</span></p>
+        <div class="currentScorea">
+            <span id="c-score"> Current Score: </span>
+            <span id="current-score">0</span>
+        </div>
         <p>Best Score: <span id="best-score">0</span></p>
+
+        <p> <span id="hint"></span></p>
+        <input type="text" id="guess-input" placeholder="Type your guess..."> <br>
+
+
         <div class="timer-clock">
             <img src="./images/timer.png" alt="" width="70px">
             <div class="timer1">
@@ -75,18 +153,23 @@
                 <p id="timer">30</p>
             </div>
         </div>
-        <p>Hint: <span id="hint"></span></p>
-        <input type="text" id="guess-input" placeholder="Type your guess...">
-        <button onclick="checkGuess()">Submit Guess</button>
-        <button onclick="refreshWord()">Refresh Word</button>
+        <button onclick="checkGuess()" class="button">Submit Guess</button>
 
-        <div id="word-display"></div>
+        <div style="display: flex; justify-content: center;gap:20px;">
 
+            <div id="word-display"></div>
+            <img src="./images/refresh.svg" alt="" width="50px" onclick="refreshWord()">
+
+        </div>
+
+        <div class="quit-footer">
+            <img src="./images/question.svg" alt="" width="40px" onclick="showHint()" style="padding-left: 20px;">
+            <button class="button">Quit</button>
+
+
+        </div>
         <div id="display-correct-word" style="display: none;"></div>
-
     </div>
-
-
 
     <script type="module">
 
@@ -198,7 +281,6 @@
         //     return word.split('').sort(() => Math.random() - 1).join('');
         // }
 
-
         function displayNewWord() {
             const randomIndex = Math.floor(Math.random() * words.length);
             const wordToGuess = words[randomIndex];
@@ -217,7 +299,16 @@
                 wordDisplayContainer.appendChild(letterBox);
             }
 
-            document.getElementById("hint").textContent = "Hint: " + wordToGuess.hint;
+            // Set the hint but do not display it immediately
+            const hintElement = document.getElementById("hint");
+            hintElement.textContent = "Hint: " + wordToGuess.hint;
+            hintElement.style.display = "none";
+        }
+
+        function showHint() {
+            // Show the hint when the button is clicked
+            const hintElement = document.getElementById("hint");
+            hintElement.style.display = "block";
         }
 
         function scrambleWord(word) {
