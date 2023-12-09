@@ -1,75 +1,130 @@
 <html>
-
-<head>
+  <head>
     <title>Firebase Authentication</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
-
+  <body>
     <div id="login-box">
-        <div class="left">
-            <h1> Sign up </h1>
-            <input type="text" id="displayName" name="displayName" placeholder="Username" />
-            <input type="text" id="email" name="email" placeholder="E-mail" />
-            <input type="password" id="password" name="password" placeholder="Password" />
-
-            <input type="submit" id='signUp' name="signup_submit" value="Signup" />
+      <div class="right">
+        <div class="login-boxx">
+          <img src="./images/user.png" alt="" width="100px" />
         </div>
+        <div
+        style="
+          display: flex;
+          align-items: start;
+          flex-direction: column;
+          gap: 10px;
+        "
+      >
+        <label for="login-email">Username</label>
+    
+        <input
+          type="text"
+          id="displayName"
+          name="displayName"
+          placeholder="Username"
+        />
+    </div>
+
+    <div
+    style="
+      display: flex;
+      align-items: start;
+      flex-direction: column;
+      gap: 10px;
+    "
+  >
+    <label for="login-email">Email</label>
+
+    <input type="text" id="email" name="email" placeholder="Email" />
+</div>
+
+<div
+style="
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 10px;
+"
+>
+<label for="login-email">Password</label>
+<input
+  type="password"
+  id="password"
+  name="password"
+  placeholder="Password"
+/>
+</div>
+
+        <input type="submit" id="signUp" name="signup_submit" value="Signup" />
+
+        <p>OR</p>
+        <button class="button"><a href="login.html">Login </a></button>
+      </div>
     </div>
 
     <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import {
+        getDatabase,
+        set,
+        ref,
+      } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyCyzZ8UZkzbBNdVBQZ4L7NOJxwRuOrtLSY",
+        authDomain: "wordcheck-d715f.firebaseapp.com",
+        projectId: "wordcheck-d715f",
+        storageBucket: "wordcheck-d715f.appspot.com",
+        messagingSenderId: "74614979893",
+        appId: "1:74614979893:web:9afed2b2318e4ad665607c",
+        measurementId: "G-1ZK7N48W1S",
+      };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCyzZ8UZkzbBNdVBQZ4L7NOJxwRuOrtLSY",
-            authDomain: "wordcheck-d715f.firebaseapp.com",
-            projectId: "wordcheck-d715f",
-            storageBucket: "wordcheck-d715f.appspot.com",
-            messagingSenderId: "74614979893",
-            appId: "1:74614979893:web:9afed2b2318e4ad665607c",
-            measurementId: "G-1ZK7N48W1S"
-        };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+      var auth = getAuth(app);
 
-        var auth = getAuth(app);
+      signUp.addEventListener("click", async (e) => {
+        e.preventDefault();
 
-        signUp.addEventListener('click', async (e) => {
-            e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const displayName = document.getElementById("displayName").value;
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const displayName = document.getElementById('displayName').value;
+        try {
+          const response = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
 
-            try {
-                const response = await createUserWithEmailAndPassword(auth, email, password);
+          // Save user data to Realtime Database
+          const userRef = ref(database, "users/" + response.user.uid);
+          set(userRef, {
+            email: email,
+            displayName: displayName,
+          });
 
-                // Save user data to Realtime Database
-                const userRef = ref(database, 'users/' + response.user.uid);
-                set(userRef, {
-                    email: email,
-                    displayName: displayName,
-                });
+          window.location.href = "login.html";
 
-                window.location.href = "login.html";
-
-                console.log("User created successfully:", response.user);
-            } catch (error) {
-                console.error("Error creating user:", error.message);
-            }
-        });
+          console.log("User created successfully:", response.user);
+        } catch (error) {
+          console.error("Error creating user:", error.message);
+        }
+      });
     </script>
-</body>
-
+  </body>
 </html>
-
 
 <!-- // try {
 // const userCredential = await createUserWithEmailAndPassword(auth, email, password);

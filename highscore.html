@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highscore Table</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+        background-color: #414bb2;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      h1 {
+        font-size: 50px;
+        background-color: #bb0f73;
+        padding: 10px 20px;
+      }
+
+      #userTable {
+        border-collapse: collapse;
+        width: 50%;
+        margin-top: 10px;
+        overflow-y: auto; /* Enable vertical scrolling */
+        max-height: 30vh; /* Set maximum height */
+      }
+
+      #userTable th,
+      #userTable td {
+        border: 2px solid white;
+        padding: 10px;
+        text-align: center;
+      }
+
+      #userTable th {
+        /* background-color: purple; */
+        color: white;
+        font-size: 20px;
+      }
+      #userTable td {
+        /* background-color: purple; */
+        color: white;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Highscore</h1>
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- User data will be displayed here -->
+      </tbody>
+    </table>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCyzZ8UZkzbBNdVBQZ4L7NOJxwRuOrtLSY",
+        authDomain: "wordcheck-d715f.firebaseapp.com",
+        projectId: "wordcheck-d715f",
+        storageBucket: "wordcheck-d715f.appspot.com",
+        messagingSenderId: "74614979893",
+        appId: "1:74614979893:web:9afed2b2318e4ad665607c",
+        measurementId: "G-1ZK7N48W1S",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      const userTable = document.getElementById("userTable");
+
+      // Reference to the "playerScore" collection
+      const playerScoreRef = ref(database, "playerScore");
+  // Listen for changes in the data
+  onValue(playerScoreRef, (snapshot) => {
+    // Clear the table before updating
+    // userTable.innerHTML = "";
+
+    snapshot.forEach((childSnapshot) => {
+      const userData = childSnapshot.val();
+      const userName = userData.displayName;
+      const userScore = userData.score;
+
+      // Create a new row in the table
+      const newRow = userTable.insertRow();
+
+      // Create cells for the name and score
+      const nameCell = newRow.insertCell(0);
+      const scoreCell = newRow.insertCell(1);
+
+      // Set the text content of the cells
+      nameCell.textContent = userName;
+      scoreCell.textContent = userScore;
+
+      // Prepend the new row to the table
+      userTable.insertBefore(newRow, userTable.firstChild);
+    });
+      });
+    </script>
+  </body>
+</html>
